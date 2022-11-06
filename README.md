@@ -3,6 +3,7 @@
 Simple git-hooks `template` via python for C++ repos:
 - pre-commit:
   - run clang-format for changes
+- commit-msg:
   - verify commit message format
 - prepare-commit-msg:
   - prepare template commit message
