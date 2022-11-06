@@ -2,6 +2,7 @@
 from enum import Enum
 from pathlib import Path
 from shutil import copy
+from string import Template
 from typing import Protocol
 from platform import system
 
@@ -37,18 +38,19 @@ class Windows:
     HOOK_TEMPLATE = '\n'.join([
         '#!/bin/sh',
         'COMMIT_MSG_FILE=$1',
-        'python .git/hooks/prepare-commit-msg.py "$COMMIT_MSG_FILE"',
+        'python .git/hooks/${hook_script} "$COMMIT_MSG_FILE"',
     ])
 
     @classmethod
     def install_hook(cls, hook: Path, destination: Path) -> None:
         copy(src=hook, dst=destination.parent / hook.name)
-        cls.__create_hook_file(destination)
+        cls.__create_hook_file(str(hook.name), destination)
 
     @classmethod
-    def __create_hook_file(cls, filename: Path) -> None:
+    def __create_hook_file(cls, hook_name: str, filename: Path) -> None:
         with open(filename, 'w', encoding='utf-8') as file:
-            file.writelines(cls.HOOK_TEMPLATE)
+            script_template = Template(cls.HOOK_TEMPLATE)
+            file.write(script_template.safe_substitute(hook_script=hook_name))
             file.write('\n')
 
 
